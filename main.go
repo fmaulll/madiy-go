@@ -19,6 +19,7 @@ func main() {
 
 	router.GET("/customer", controllers.GetCustomer)
 	router.POST("/customer", controllers.AddCustomer)
+	router.POST("/transaction", controllers.AddTransaction)
 
 	router.Run(":" + os.Getenv("PORT"))
 }
