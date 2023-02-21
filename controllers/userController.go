@@ -9,12 +9,13 @@ import (
 	"github.com/fmaulll/mandiy-go/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func Signup(context *gin.Context) {
 	var body struct {
-		Username string
+		Email    string
 		Password string
 	}
 
@@ -32,7 +33,10 @@ func Signup(context *gin.Context) {
 		return
 
 	}
-	user := models.User{Username: body.Username, Password: string(hash)}
+
+	uid := uuid.New()
+
+	user := models.User{Id: uid, Email: body.Email, Password: string(hash)}
 
 	result := initializers.DB.Create(&user)
 
@@ -43,12 +47,12 @@ func Signup(context *gin.Context) {
 
 	}
 
-	context.JSON(http.StatusCreated, gin.H{"message": "User " + body.Username + " created"})
+	context.JSON(http.StatusCreated, gin.H{"message": "User " + body.Email + " created"})
 }
 
 func Login(context *gin.Context) {
 	var body struct {
-		Username string
+		Email    string
 		Password string
 	}
 
@@ -58,9 +62,9 @@ func Login(context *gin.Context) {
 		return
 	}
 	var user models.User
-	initializers.DB.First(&user, "username = ?", body.Username)
+	initializers.DB.First(&user, "email = ?", body.Email)
 
-	if user.ID == 0 {
+	if user.Id == uuid.MustParse("00000000-0000-0000-0000-000000000000") {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Invalid email or password"})
 
 		return
@@ -75,8 +79,8 @@ func Login(context *gin.Context) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": user.ID,
-		"exp": time.Now().Add(time.Hour).Unix(),
+		"sub": user.Id,
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
 	})
 
 	// Sign and get the complete encoded token as a string using the secret
@@ -89,9 +93,9 @@ func Login(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusOK, gin.H{
-		"message":  "Login successfully",
-		"token":    tokenString,
-		"id":       user.ID,
-		"username": body.Username,
+		"message": "Login successfully",
+		"token":   tokenString,
+		"id":      user.Id,
+		"email":   body.Email,
 	})
 }
