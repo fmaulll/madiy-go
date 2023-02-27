@@ -35,7 +35,7 @@ func AddTransaction(context *gin.Context) {
 
 	var totalTransaction []models.Transaction
 
-	if err := initializers.DB.Where("customer_id = ?", customerId).Find(&totalTransaction).Error; err != nil {
+	if err := initializers.DB.Where("customer_id = ? AND price <> ?", customerId, 0).Find(&totalTransaction).Error; err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to count transaction!"})
 
 		return
@@ -77,6 +77,20 @@ func UsePoint(context *gin.Context) {
 	userId := uuid.MustParse(body.UserId)
 
 	transaction := models.Transaction{Id: uid, CustomerId: customerId, UserId: userId, Price: 0}
+
+	initializers.DB.Where("id = ?", customerId).Find(&customer)
+
+	if customer.Id == uuid.MustParse("00000000-0000-0000-0000-000000000000") {
+		context.JSON(http.StatusNotFound, gin.H{"message": "Customer not found in database!"})
+
+		return
+	}
+
+	if customer.Point == 0 {
+		context.JSON(http.StatusNotFound, gin.H{"message": "Customer doesn't have any point!"})
+
+		return
+	}
 
 	if err := initializers.DB.Create(&transaction).Error; err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create transaction!"})
