@@ -50,12 +50,12 @@ func AddTransaction(context *gin.Context) {
 			return
 		}
 
-		context.JSON(http.StatusCreated, gin.H{"message": "Succes added transaction, you gained 1 point!", "length": len(totalTransaction), "transactions": totalTransaction})
+		context.JSON(http.StatusCreated, gin.H{"message": "Success added transaction, you gained 1 point!", "length": len(totalTransaction), "transactions": totalTransaction})
 
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"message": "Succes added transaction"})
+	context.JSON(http.StatusOK, gin.H{"message": "Success added transaction"})
 }
 
 func UsePoint(context *gin.Context) {
@@ -90,5 +90,5 @@ func UsePoint(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"message": "Succes using point for transaction!"})
+	context.JSON(http.StatusOK, gin.H{"message": "Success using point for transaction!"})
 }
