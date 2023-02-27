@@ -31,6 +31,7 @@ func main() {
 	router.GET("/customer", controllers.GetCustomer)
 	router.POST("/customer", controllers.AddCustomer)
 	router.POST("/transaction", controllers.AddTransaction)
+	router.PATCH("/transaction", controllers.UsePoint)
 
 	router.Run(":" + os.Getenv("PORT"))
 }
